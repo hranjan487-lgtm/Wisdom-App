@@ -21,7 +21,17 @@ jobs:
         run: pip install -r requirements.txt
 
       - name: Download PDFs from Google Drive
+        continue-on-error: true  # gdown often exits 1 even when nearly all files downloaded fine
         run: gdown --folder "https://drive.google.com/drive/folders/${{ secrets.DRIVE_FOLDER_ID }}" -O pdfs
+
+      - name: Verify PDFs downloaded
+        run: |
+          count=$(find pdfs -name "*.pdf" | wc -l)
+          echo "Found $count PDF files in pdfs/"
+          if [ "$count" -lt 150 ]; then
+            echo "Too few PDFs downloaded ($count) - treating as a real failure, not just gdown's flaky exit code."
+            exit 1
+          fi
 
       - name: Extract and embed corpus
         env:
