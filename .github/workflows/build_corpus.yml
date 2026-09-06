@@ -21,7 +21,7 @@ jobs:
         run: pip install -r requirements.txt
 
       - name: Download PDFs from Google Drive
-        run: gdown --folder "https://drive.google.com/drive/folders/${{ secrets.DRIVE_FOLDER_ID }}" -O pdfs --remaining-ok
+        run: gdown --folder "https://drive.google.com/drive/folders/${{ secrets.DRIVE_FOLDER_ID }}" -O pdfs
 
       - name: Extract and embed corpus
         env:
