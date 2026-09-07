@@ -1,3 +1,4 @@
-gdown
 PyMuPDF
 voyageai
+google-api-python-client
+google-auth
