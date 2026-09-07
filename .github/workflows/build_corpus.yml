@@ -9,7 +9,7 @@ permissions:
 jobs:
   build-corpus:
     runs-on: ubuntu-latest
-    timeout-minutes: 60
+    timeout-minutes: 180  # increased: retrying the flaky download can take a while
     steps:
       - uses: actions/checkout@v4
 
@@ -21,8 +21,19 @@ jobs:
         run: pip install -r requirements.txt
 
       - name: Download PDFs from Google Drive
-        continue-on-error: true  # gdown often exits 1 even when nearly all files downloaded fine
-        run: gdown --folder "https://drive.google.com/drive/folders/${{ secrets.DRIVE_FOLDER_ID }}" -O pdfs
+        run: |
+          mkdir -p pdfs
+          for attempt in 1 2 3 4 5; do
+            echo "=== Download attempt $attempt ==="
+            gdown --folder "https://drive.google.com/drive/folders/${{ secrets.DRIVE_FOLDER_ID }}" -O pdfs --continue || true
+            count=$(find pdfs -name "*.pdf" | wc -l)
+            echo "Have $count PDF files so far"
+            if [ "$count" -ge 200 ]; then
+              echo "Close enough to the full 208 - stopping retries"
+              break
+            fi
+            sleep 20
+          done
 
       - name: Verify PDFs downloaded
         run: |
