@@ -37,12 +37,12 @@ jobs:
       - name: Extract and embed corpus
         env:
           VOYAGE_API_KEY: ${{ secrets.VOYAGE_API_KEY }}
-        run: python extract_and_embed.py --pdf-dir pdfs --out corpus_embeddings.jsonl
+        run: python extract_and_embed.py --pdf-dir pdfs --out corpus_embeddings.jsonl.gz
 
       - name: Commit result back to repo
         run: |
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
-          git add corpus_embeddings.jsonl
+          git add corpus_embeddings.jsonl.gz
           git diff --staged --quiet || git commit -m "Rebuild corpus embeddings"
           git push
